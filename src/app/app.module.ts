@@ -11,24 +11,17 @@ import { AppRoutingModule } from './app-routing.module';
 /////////////////////
 
 import {Geolocation} from '@ionic-native/geolocation/ngx';
-//  firebase imports, remove what you don't require
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireAuthModule } from '@angular/fire/auth';
-import { AngularFireDatabaseModule } from '@angular/fire/database';
-import { AngularFireStorageModule } from '@angular/fire/storage';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
-// environment
+import { HttpClientModule } from '@angular/common/http';
+
+
+// IMPORTAR EL OBJETO DE CONFIGURACION 
 import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,
-    AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFireAuthModule,
-    AngularFireDatabaseModule,
-    AngularFirestoreModule,
-    AngularFireStorageModule
+    HttpClientModule
   ],
   providers: [
     StatusBar,

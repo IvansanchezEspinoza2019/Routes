@@ -26,8 +26,10 @@
     "@ionic-native/status-bar": "^5.0.0",
     "@ionic/angular": "^5.0.0",
     "angularfire2": "^5.4.2",
+    "component": "^1.1.0",
     "core-js": "^2.5.4",
-    "firebase": "^7.13.2",
+    "google": "^2.1.0",
+    "maps": "^0.3.3",
     "rxjs": "~6.5.1",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1"

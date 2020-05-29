@@ -1,19 +1,29 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
-      Google Map
+    <ion-title class="ion-text-center">
+      Application to calculate routes
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content>
 
 
- <!--create a element for map. #Map - identifier -->
- <div id="map"></div>
 
- 
-<ion-label>HOLA</ion-label>
+  <div class="Form">
+    <h2 class="ion-text-center">Capturar Datos</h2>
+       <ion-label position="fixed">Origen</ion-label>
+       <ion-searchbar  showCancelButton searchIcon="search" [(ngModel)]="address.origin" placeholder="Search Some Values" (ionChange)="desactOrigin()" ></ion-searchbar>
+     
+        <ion-label position="fixed">Destino</ion-label>
+        <ion-searchbar  showCancelButton searchIcon="search" [(ngModel)]="address.destiny" placeholder="Search Some Values" (ionChange)="desactDestiny()" ></ion-searchbar>
+
+
+        <ion-button (click)="initProcess()">Generate Route</ion-button>
+</div>
+<br>
+<div id="map"></div> 
+
+
 
 </ion-content>
