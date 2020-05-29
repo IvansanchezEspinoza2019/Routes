@@ -1,7 +1,8 @@
 import {Component, ElementRef, NgZone, ViewChild, OnInit} from '@angular/core';
 import { async } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
-// IMPORTAR EL OBJETO DE CONFIGURACION 
+
+// import the google maps api key
 import { environment } from '../../environments/environment';
 
 
@@ -28,29 +29,33 @@ export class HomePage implements OnInit {
  
   constructor(private http: HttpClient) {
     // constructor
-    console.log(environment.googleMapsApi.apiKey)
+    
+  }
+  mode: any;
+
+  verifyMode(){
+    console.log(this.mode)
   }
 
-
-  
+  // to save the address 
   address = {
     "origin": "",
     "destiny": ""
   }
-
 
   ngOnInit(){
     // init the map
     this.loadMap()
   }
 
-  setCoords(coords){
-    console.log("Funcion de la clase");
-   
-}
+  ionViewWillEnter(){
+    // this function is used because we need the DOM to be loaded
+    console.log("DOM CHARGED");
+    // set the autocomplete listener functions
+    this.setAutocomplete();
+  }
 
   loadMap(){
-
     // load the map and directions service for getting routes
     var mapProp = {
       center: new google.maps.LatLng(20.656968422988143, -103.32492740554504),
@@ -127,58 +132,111 @@ export class HomePage implements OnInit {
   }
   
 
-  ionViewWillEnter(){
-    // this function is used because we need the DOM to be loaded
-
-    console.log("DOM CHARGED");
-
-    // set the autocomplete listener functions
-    this.setAutocomplete();
-  }
-
 
   getRoute(origin_coords, destiny_coords) {
 
-    // funcion que obtiene ruta entre dos puntos
-    /// se pasan como parámetro las coordenadas de origen y destino
+    // function tha obtein the route between two routes
 
-    // comvierte las coordenadas en tipo de dato "LatLng" de google maps
+    // initialize starting point and destination
     var inicio=new google.maps.LatLng(origin_coords.lat, origin_coords.lng);
     var fin=new google.maps.LatLng(destiny_coords.lat, destiny_coords.lng);
+
+
     
-    // guadamos nuestros parámetros
-    var peticion = {
+    console.log(this.mode);
+    if ( !this.mode){
+      console.log("Please select a travel mode");
+      return;
+    }
+    
+    // save the data above
+    var prtition = {
       origin:inicio,
       destination:fin,
-      travelMode: google.maps.DirectionsTravelMode.DRIVING,
-    
+      travelMode: google.maps.TravelMode[this.mode]
     };
 
-    // referencia al mapa 
+    // reference to the map
     directionsRenderer.setMap(map);
-    servicioDireccion.route(peticion, function(response, status) {
+    servicioDireccion.route(prtition, function(response, status) {
         
-      // esto verifica el estatus de la peticion
+      // verify the status of the petition
       if (status === 'OK') {
-        // si es entonces pondrá las direcciones en el mapa
+        // if all went good, then put it in the map
         directionsRenderer.setDirections(response);
       }else {
-        // sino mostrará un mensaje de error
+        // selse, show an error
         window.alert('Directions request failed due to ' + status);
       }
-      // imprime el resultado de la peticion
+      // print the results of the petition
       console.log(response);
     });
 
   }
 
+//////// main function /////
+  initProcess(){
+
+    console.log(coords_origin)
+    console.log(coords_destiny)
+
+     // do some validations
+      if(this.mode){
+        if ( !coords_origin  || ! coords_destiny){
+          if (!coords_origin && coords_destiny){
+            // if we have the destiny coordinates, but no the origin coordinates
+            this.getOriginCoords();
+            
+          }
+          else if (coords_origin && !coords_destiny){
+             // if we have the origin coordinates, but no the destiny coordinates
+             this.getDestinyCoords();
+              
+          }
+          else{
+             // if we not have any coordinates
+              this.getBothCoords()
+          }
+      }
+      else{
+        console.log("ALL GOOD");
+        this.getRoute(coords_origin, coords_destiny);
+      } 
+
+      }
+      else{
+        console.log("Please select a travel mode");
+      }
+      
+
+     
+     
+       
+    }
+
+    desactOrigin(){
+      coords_origin = null;
+    }
+    desactDestiny(){
+      coords_destiny = null;
+    }
+
+
+
+////////////////////////////// get coordinates from an address string /////////////////////////////////////////
+    
   getOriginCoords(){
-    // obtiene la locacion del origen mediante una direccion (string) dado
+    if(this.address.origin == ""){
+      console.log("Please input an address");
+      return;
+    }
+    
+    // get the latitud and longitud for the origin from an address string 
     let getLatLngOrigin = new Promise<any>((resolve, reject)=>{
       this.http.get(this.apiUrl, {
         params: {
           address: this.address.origin,
-          key: 'AIzaSyBMkmpcK2Ic4SezUQrh6SRVrMO_IRL043o'
+          key: environment.googleMapsApi.apiKey
         }
       })
       .subscribe(res=>{resolve(res)}, err=>{reject(err)})
@@ -201,7 +259,7 @@ export class HomePage implements OnInit {
     getCoords().then(res=>{
       console.log(res);
       if(coords_destiny){
-        //calculating the route
+        //call the function to get the route
         this.getRoute(coords_origin,coords_destiny);
       }
       
@@ -215,12 +273,16 @@ export class HomePage implements OnInit {
 
 
   getDestinyCoords(){
-    // obtiene la locacion del origen mediante una direccion (string) dado
+    if(this.address.destiny==""){
+      console.log("Please input an address");
+      return;
+    }
+    // get the latitud and longitud for the destiny from an address string 
     let getLatLngDestiny = new Promise<any>((resolve, reject)=>{
       this.http.get(this.apiUrl, {
         params: {
           address: this.address.destiny,
-          key: 'AIzaSyBMkmpcK2Ic4SezUQrh6SRVrMO_IRL043o'
+          key: environment.googleMapsApi.apiKey
         }
       })
       .subscribe(res=>{resolve(res)}, err=>{reject(err)})
@@ -244,7 +306,7 @@ export class HomePage implements OnInit {
 
       console.log(res);
       if(coords_origin){
-        //calculating the route
+        //call the function to get the route
         this.getRoute(coords_origin,coords_destiny);
       }
       
@@ -256,60 +318,31 @@ export class HomePage implements OnInit {
 
   }
   
-
-  initProcess(){
-    console.log(coords_origin)
-    console.log(coords_destiny)
-      if ( !coords_origin  || ! coords_destiny){
-          if (!coords_origin && coords_destiny){
-            // if we have the destiny coordinates, but no the origin coordinates
-            this.getOriginCoords();
-            
-
-          }
-          else if (coords_origin && !coords_destiny){
-             // if we have the origin coordinates, but no the destiny coordinates
-             this.getDestinyCoords();
-              
-          }
-          else{
-             // if we not have any coordinates
-              this.getBothCoords()
-          }
-      }
-      else{
-        console.log("ALL GOOD");
-        this.getRoute(coords_origin, coords_destiny);
-      }  
-    }
-
-    desactOrigin(){
-      coords_origin = null;
-    }
-    desactDestiny(){
-      coords_destiny = null;
-    }
     
     getBothCoords(){
-      // inicia los procesos necesario para obtener la ruta entre dos puntos
+      if( this.address.origin=="" || this.address.destiny==""){
+        console.log("Please input an address");
+        return;
+      }
+     // get the latitud and longitud for the origin and destiny from an address string 
 
-      // obtiene la locacion del origen mediante una direccion (string) dado
+     // make a promise
       let getLatLngOrigin = new Promise<any>((resolve, reject)=>{
         this.http.get(this.apiUrl, {
           params: {
             address: this.address.origin,
-            key: 'AIzaSyBMkmpcK2Ic4SezUQrh6SRVrMO_IRL043o'
+            key: environment.googleMapsApi.apiKey
           }
         })
         .subscribe(res=>{resolve(res)}, err=>{reject(err)})
       });
 
-      // obtiene la locacion del destino mediante una direccion (string) dado
+      // make a promise      
       let getLatLngDestiny= new Promise<any>((resolve, reject)=>{
         this.http.get(this.apiUrl, {
           params: {
             address: this.address.destiny,
-            key: 'AIzaSyBMkmpcK2Ic4SezUQrh6SRVrMO_IRL043o'
+            key: environment.googleMapsApi.apiKey
           }
         })
         .subscribe(res=>{resolve(res)}, err=>{reject(err)})
@@ -318,12 +351,11 @@ export class HomePage implements OnInit {
 
       
       async function getCoords(): Promise<any> {
-        // funcion asícrona necesaria para esperar a la respuesta de la api
-       // de google, tanto para la peticion de origen como la de destino
+        
 
-        // hace la peticion para el origen
+        // make petition for origin and destiny
         let origin = await getLatLngOrigin;
-        // hace la peticion para el destino
+        
         let destiny = await getLatLngDestiny;
 
 
@@ -349,16 +381,13 @@ export class HomePage implements OnInit {
       }
 
 
-      // finalmente llamamos a la funcion asíncrona
+      // this is an async function
       getCoords().then(result => {
-        // cuando se llega a este punto, ya se habra obtenido una respuesta
-        // para el origen y destino que hicimos anteriormente
-        
-        // imprime los resultados
+
+        // print the results
         console.log(result);
 
-        // manda a llamar a la funcion que calculará la ruta, enviándole los 
-        // datos obtenidos
+        // call the function to get the route
         this.getRoute(coords_origin, coords_destiny);
 
 

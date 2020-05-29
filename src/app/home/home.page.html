@@ -1,26 +1,35 @@
 <ion-header>
   <ion-toolbar>
     <ion-title class="ion-text-center">
-      Application to calculate routes
+      Routes
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-
+ 
 
   <div class="Form">
-    <h2 class="ion-text-center">Capturar Datos</h2>
+    <h2 class="ion-text-center">Capture data</h2>
        <ion-label position="fixed">Origen</ion-label>
        <ion-searchbar  showCancelButton searchIcon="search" [(ngModel)]="address.origin" placeholder="Search Some Values" (ionChange)="desactOrigin()" ></ion-searchbar>
      
         <ion-label position="fixed">Destino</ion-label>
         <ion-searchbar  showCancelButton searchIcon="search" [(ngModel)]="address.destiny" placeholder="Search Some Values" (ionChange)="desactDestiny()" ></ion-searchbar>
+        <br>
+        <ion-label>Mode</ion-label>
+        <ion-segment  [(ngModel)] = "mode">
+          <ion-segment-button value="DRIVING">Driving</ion-segment-button>
+          <ion-segment-button value="WALKING">Walking</ion-segment-button>
+          <ion-segment-button value="BICYCLING">Bicycling</ion-segment-button>
+        </ion-segment>
+        
+      
 
-
-        <ion-button (click)="initProcess()">Generate Route</ion-button>
 </div>
+<br>
+<ion-button (click)="initProcess()"  expand="block" fill="outline" size="default" color="success" >Generate Route</ion-button>
 <br>
 <div id="map"></div> 
 
