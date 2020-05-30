@@ -238,7 +238,7 @@ export class HomePage implements OnInit {
   getOriginCoords(){
     if(this.address.origin == ""){
       console.log("Please input an address");
-      this.presentAlert("Warning","Missing parameter","Please enter a origin address");
+      this.presentAlert("Warning","Missing parameter","Please enter an origin address");
       return;
     }
     
