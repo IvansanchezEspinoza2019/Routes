@@ -18,7 +18,7 @@
         <ion-label position="fixed">Destino</ion-label>
         <ion-searchbar  showCancelButton searchIcon="search" [(ngModel)]="address.destiny" placeholder="Search Some Values" (ionChange)="desactDestiny()" ></ion-searchbar>
         <br>
-        <ion-label>Mode</ion-label>
+        <ion-label>Travel mode</ion-label>
         <ion-segment  [(ngModel)] = "mode">
           <ion-segment-button value="DRIVING">Driving</ion-segment-button>
           <ion-segment-button value="WALKING">Walking</ion-segment-button>
@@ -29,7 +29,7 @@
 
 </div>
 <br>
-<ion-button (click)="initProcess()"  expand="block" fill="outline" size="default" color="success" >Generate Route</ion-button>
+<ion-button (click)="initProcess()"  expand="block" fill="outline" size="default" color="success" >Accept</ion-button>
 <br>
 <div id="map"></div> 
 

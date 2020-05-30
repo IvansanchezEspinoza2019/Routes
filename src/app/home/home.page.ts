@@ -25,13 +25,17 @@ var coords_destiny: any
 
 export class HomePage implements OnInit {
 
+  // api url for obteining latitud and longitud from an string 
   apiUrl: string = "https://maps.googleapis.com/maps/api/geocode/json"
+
+  // for controlling  the travel mode
+  mode: any;
  
   constructor(private http: HttpClient) {
     // constructor
     
   }
-  mode: any;
+ 
 
   verifyMode(){
     console.log(this.mode)
@@ -43,6 +47,8 @@ export class HomePage implements OnInit {
     "destiny": ""
   }
 
+
+
   ngOnInit(){
     // init the map
     this.loadMap()
@@ -50,7 +56,7 @@ export class HomePage implements OnInit {
 
   ionViewWillEnter(){
     // this function is used because we need the DOM to be loaded
-    console.log("DOM CHARGED");
+    console.log("DOM Loaded");
     // set the autocomplete listener functions
     this.setAutocomplete();
   }
@@ -59,17 +65,19 @@ export class HomePage implements OnInit {
     // load the map and directions service for getting routes
     var mapProp = {
       center: new google.maps.LatLng(20.656968422988143, -103.32492740554504),
-      zoom: 15,
+      zoom: 12,
     };
 
     // creating the map
     map = new google.maps.Map(document.getElementById('map'), mapProp);
+    // creating the directions service
     servicioDireccion = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer();
   }
 
+
   setAutocomplete(){
- 
+
       // creating the autocomplete for origin and destiny searchbar  
       // and setting the 'place_changed' functions
 
@@ -78,7 +86,7 @@ export class HomePage implements OnInit {
       // searchbar for destiny
       let search_destiny = <HTMLInputElement>document.getElementsByClassName('searchbar-input')[1];
       
-      ////////////// origin //////////
+      ///////////////////////////////   origin  ////////////////////////////////
       // creating autocomplete google object
       var autCompleteOrigin = new google.maps.places.Autocomplete(
         (search_origin));
@@ -87,6 +95,7 @@ export class HomePage implements OnInit {
       
           if (!placeOrigin.geometry) {
             // if the place does not have a latitud and longitud
+    
             console.log("Could not get coordinates from: "+ placeOrigin.name);
             coords_origin = null;
             return;
@@ -103,7 +112,7 @@ export class HomePage implements OnInit {
       } );
 
     
-      ////////// destiny //////////
+      ///////////////////////////////   destiny ////////////////////////////////
       // creating autocomplete google object
       var autCompleteDestiny = new google.maps.places.Autocomplete(
         (search_destiny));
@@ -115,6 +124,7 @@ export class HomePage implements OnInit {
         if (!placeDestiny.geometry) {
           // if the place does not have a latitud and longitud
           console.log("Could not get coordinates from: "+ placeDestiny.name);
+
           coords_destiny = null;
           return;
         }
@@ -137,15 +147,16 @@ export class HomePage implements OnInit {
 
     // function tha obtein the route between two routes
 
-    // initialize starting point and destination
+    // initialize the starting and destination points
     var inicio=new google.maps.LatLng(origin_coords.lat, origin_coords.lng);
     var fin=new google.maps.LatLng(destiny_coords.lat, destiny_coords.lng);
 
 
     
     console.log(this.mode);
+    // validates the traveling mode
     if ( !this.mode){
-      console.log("Please select a travel mode");
+      this.presentAlert("Warning","Missing parameter", "Please select a travel mode!");
       return;
     }
     
@@ -162,11 +173,13 @@ export class HomePage implements OnInit {
         
       // verify the status of the petition
       if (status === 'OK') {
+        
         // if all went good, then put it in the map
         directionsRenderer.setDirections(response);
       }else {
         // selse, show an error
-        window.alert('Directions request failed due to ' + status);
+        //window.alert('Directions request failed due to ' + status);
+        this.presentAlert("Error","An error ocurred", "Directions request failed due to: "+status);
       }
       // print the results of the petition
       console.log(response);
@@ -174,7 +187,7 @@ export class HomePage implements OnInit {
 
   }
 
-//////// main function /////
+/////////////////////////////////// main function ///////////////////////////////
   initProcess(){
 
     console.log(coords_origin)
@@ -199,19 +212,16 @@ export class HomePage implements OnInit {
           }
       }
       else{
-        console.log("ALL GOOD");
+        console.log("All good");
         this.getRoute(coords_origin, coords_destiny);
       } 
 
       }
       else{
+        this.presentAlert("Warning","Missing parameter", "Please select a travel mode!");
         console.log("Please select a travel mode");
       }
-      
-
-     
-     
-       
+         
     }
 
     desactOrigin(){
@@ -228,6 +238,7 @@ export class HomePage implements OnInit {
   getOriginCoords(){
     if(this.address.origin == ""){
       console.log("Please input an address");
+      this.presentAlert("Warning","Missing parameter","Please enter a origin address");
       return;
     }
     
@@ -266,6 +277,7 @@ export class HomePage implements OnInit {
     }, err=>{
       // errors
       console.log("Wrong origin, please enter a valid place!");
+      this.presentAlert("Error","Data error","Incorrect origin address, please enter a valid place!");
       console.log(err)
     })
 
@@ -274,7 +286,7 @@ export class HomePage implements OnInit {
 
   getDestinyCoords(){
     if(this.address.destiny==""){
-      console.log("Please input an address");
+      this.presentAlert("Warning","Missing parameter","Please enter a destination address");
       return;
     }
     // get the latitud and longitud for the destiny from an address string 
@@ -282,7 +294,7 @@ export class HomePage implements OnInit {
       this.http.get(this.apiUrl, {
         params: {
           address: this.address.destiny,
-          key: environment.googleMapsApi.apiKey
+          key: environment.googleMapsApi.apiKey // you need to put your api key into enviroment variable
         }
       })
       .subscribe(res=>{resolve(res)}, err=>{reject(err)})
@@ -312,16 +324,16 @@ export class HomePage implements OnInit {
       
     }, err=>{
       // errors
-      console.log("Wrong destiny, please enter a valid place!");
+      console.log("Incorrect destination address, please enter a valid place!");
+      this.presentAlert("Error","Data error","Incorrect destination address, please enter a valid place!");
       console.log(err)
     })
 
   }
-  
-    
+
     getBothCoords(){
       if( this.address.origin=="" || this.address.destiny==""){
-        console.log("Please input an address");
+        this.presentAlert("Warning","Missing parameters","Please enter origin and destination address");
         return;
       }
      // get the latitud and longitud for the origin and destiny from an address string 
@@ -393,8 +405,22 @@ export class HomePage implements OnInit {
 
       }, err =>{
         console.log("Wrong origin and destiny, please enter valid places!");
+        this.presentAlert("Error","Data error","Could not get coordinates, please enter valid places!");
         console.log(err)
       })
 
     }
+
+
+    presentAlert(title: string, subtitle: string, message: string) {
+      const alert = document.createElement('ion-alert');
+      alert.cssClass = 'my-custom-class';
+      alert.header = title;
+      alert.subHeader = subtitle;
+      alert.message = message;
+      alert.buttons = ['OK'];
+
+      document.body.appendChild(alert);
+      return alert.present();
+}
 }
