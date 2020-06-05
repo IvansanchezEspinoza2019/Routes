@@ -6,9 +6,8 @@ export const environment = {
   production: false,
   
   googleMapsApi: {
-    apiKey: "AIzaSyBMkmpcK2Ic4SezUQrh6SRVrMO_IRL043o"
+    apiKey: "YOUR_API_KEY"
   }
-
 
 };
 

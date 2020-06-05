@@ -46,11 +46,18 @@ export class HomePage implements OnInit {
     "origin": "",
     "destiny": ""
   }
+ 
 
-
+/*   addScript( src ) {
+    var s = document.createElement( 'script' );
+    s.setAttribute( 'src', src );
+    document.body.appendChild( s );
+  } */
 
   ngOnInit(){
-    // init the map
+    console.log("skjkdjcbsk")
+    
+    //init the map
     this.loadMap()
   }
 
