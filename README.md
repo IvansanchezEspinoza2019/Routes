@@ -1,3 +1,4 @@
 # Routes
 It's a simple Ionic application using Google Maps Api to get routes between two points
-![alt text](https://github.com/IvansanchezEspinoza2019/Routes/enviroments_ts.png)
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
