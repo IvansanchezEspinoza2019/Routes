@@ -12,7 +12,7 @@ _In the root folder run the following command:_
 ```
 npm i
 ```
-_Next you need to put your Google Maps Api key in index.html file:_
+_Next you need to put your Google Maps Api key in src/index.html file:_
    ```
   <script  src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
   ```
